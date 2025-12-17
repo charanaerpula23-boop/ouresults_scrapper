@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>OU Results Scraper</title>
+  <link rel="stylesheet" href="/static/style.css">
+</head>
+<body>
+
+<div class="container">
+  <h1>OU Results Scraper</h1>
+
+  <div class="card">
+    <input id="url" value="https://www.osmania.ac.in/res07/20250265.jsp">
+
+    <div class="grid">
+      <input id="start" placeholder="Start Hallticket">
+      <input id="end" placeholder="End Hallticket">
+      <input id="workers" value="5">
+    </div>
+
+    <label>
+      <input type="checkbox" id="parallel" checked>
+      Parallel Mode
+    </label>
+
+    <button onclick="startScrape()">Start Scraping</button>
+  </div>
+
+  <h3>Results</h3>
+  <table>
+    <thead id="thead"></thead>
+    <tbody id="tbody"></tbody>
+  </table>
+</div>
+
+<script src="/static/app.js"></script>
+</body>
+</html>

@@ -1,0 +1,75 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>OU Results Scraper</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link rel="stylesheet" href="/static/style.css">
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+</head>
+
+<body>
+
+<header class="topbar">
+  <div class="brand">
+    <img src="https://cdn-icons-png.flaticon.com/128/4334/4334124.png">
+    <span>OU Results Scraper</span><i>by charan</i>
+  </div>
+</header>
+
+<div class="app">
+
+  <!-- Controls -->
+  <aside class="sidebar">
+    <h3>Scraper Controls</h3>
+
+    <label>Enter your Results URL</label>
+    <input id="url" value="https://www.osmania.ac.in/res07/20250265.jsp">
+
+    <label>Start Hallticket</label>
+    <input id="start" placeholder="110624861001">
+
+    <label>End Hallticket</label>
+    <input id="end" placeholder="110624861070">
+
+    <label>Workers</label>
+    <input id="workers" value="5">
+
+    <button id="startBtn" onclick="startScrape()">
+      <span id="btnText">Start Scraping</span>
+      <span id="loader" class="loader hidden"></span>
+    </button>
+  </aside>
+
+  <!-- Results -->
+  <main class="content">
+    <div class="results-header">
+      <h2>Results</h2>
+      <div class="header-controls">
+        <input type="text" id="searchInput" placeholder="🔍 Search table..." class="search-box">
+        <button onclick="downloadPDF()" class="download-btn" title="Download as PDF">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/>
+            <polyline points="7 10 12 15 17 10"/>
+            <line x1="12" y1="15" x2="12" y2="3"/>
+          </svg>
+          Download PDF
+        </button>
+        <span class="hint">Live update every 1.5s</span>
+      </div>
+    </div>
+
+    <div class="table-container" id="resultsTable">
+      <table>
+        <thead id="thead"></thead>
+        <tbody id="tbody"></tbody>
+      </table>
+    </div>
+  </main>
+
+</div>
+
+<script src="/static/app.js"></script>
+</body>
+</html>
