@@ -22,13 +22,19 @@ wheels/
 
 # Virtual Environment
 venv/
-env/
 ENV/
-.venv
+env/
 
 # Flask
 instance/
 .webassets-cache
+
+# Logs
+*.log
+
+# Environment variables
+.env
+.flaskenv
 
 # IDE
 .vscode/
@@ -41,8 +47,5 @@ instance/
 .DS_Store
 Thumbs.db
 
-# Results
-results.json
-
-# Environment variables
-.env
+# Results data (optional - remove if you want to include it)
+ou_results.json

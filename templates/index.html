@@ -1,87 +1,428 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-  <meta charset="UTF-8">
-  <title>OU Results Scraper</title>
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <link rel="stylesheet" href="/static/style.css">
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
-</head>
 
-<body>
+    <!doctype html>
+    <html lang="en">
+    <head>
+      <meta charset="utf-8" />
+      <meta name="viewport" content="width=device-width, initial-scale=1" />
+      <title>OU Results Scraper</title>
+      <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+      <style>
+        body { 
+          padding: 16px; 
+          background: linear-gradient(135deg, #0b1220 0%, #1a1f35 100%); 
+          color: #e5e7eb; 
+          min-height: 100vh;
+        }
+        .page { max-width: 1400px; margin: 0 auto; }
+        .navbar-brand { display:flex; align-items:center; gap:.75rem; font-size: 1.5rem; font-weight: 600; }
+        .logo { border-radius: 8px; }
+        .small-muted { font-size: 0.95rem; color: #94a3b8; line-height: 1.6; }
+        .panel { 
+          background: rgba(15, 23, 42, 0.8); 
+          border: 1px solid #334155; 
+          border-radius:16px; 
+          padding:24px; 
+          backdrop-filter: blur(10px);
+          box-shadow: 0 4px 6px -1px rgb(0 0 0 / 0.3);
+        }
+        .panel-light { 
+          background: rgba(15, 23, 42, 0.6); 
+          border: 1px solid #334155; 
+          border-radius:16px; 
+          backdrop-filter: blur(10px);
+        }
+        .form-control, .form-select { 
+          background: rgba(11, 18, 32, 0.8); 
+          color: #e5e7eb; 
+          border-color: #334155; 
+          padding: 0.625rem 0.875rem;
+          border-radius: 8px;
+          transition: all 0.2s;
+        }
+        .form-control:focus, .form-select:focus {
+          background: rgba(11, 18, 32, 0.95);
+          border-color: #3b82f6;
+          box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+          color: #e5e7eb;
+        }
+        .form-control::placeholder { color: #64748b; }
+        .form-label { font-weight: 500; color: #cbd5e1; margin-bottom: 0.5rem; }
+        .btn-primary { 
+          background: linear-gradient(135deg, #3b82f6 0%, #2563eb 100%);
+          border: none;
+          padding: 0.625rem 1.5rem;
+          font-weight: 500;
+          border-radius: 8px;
+          transition: all 0.2s;
+        }
+        .btn-primary:hover { 
+          transform: translateY(-1px);
+          box-shadow: 0 4px 12px rgba(59, 130, 246, 0.4);
+        }
+        .btn-export {
+          background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+          border: none;
+          color: white;
+          padding: 0.5rem 1.25rem;
+          border-radius: 8px;
+          font-weight: 500;
+          transition: all 0.2s;
+        }
+        .btn-export:hover {
+          transform: translateY(-1px);
+          box-shadow: 0 4px 12px rgba(16, 185, 129, 0.4);
+        }
+        .stats-grid {
+          display: grid;
+          grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+          gap: 1rem;
+          margin-bottom: 1.5rem;
+        }
+        .stat-card {
+          background: rgba(30, 41, 59, 0.6);
+          border: 1px solid #334155;
+          border-radius: 12px;
+          padding: 1.25rem;
+          text-align: center;
+        }
+        .stat-value {
+          font-size: 2rem;
+          font-weight: 700;
+          color: #3b82f6;
+          margin-bottom: 0.25rem;
+        }
+        .stat-label {
+          font-size: 0.875rem;
+          color: #94a3b8;
+          text-transform: uppercase;
+          letter-spacing: 0.05em;
+        }
+        .table-container {
+  background: #000000;
+  border: 1px solid #1a1a1a;
+  border-radius: 16px;
+  overflow: hidden;
+}
+.table { margin-bottom: 0; color: #ffffff; background: #000000; }
+.table thead { background: #000000; position: sticky; top: 0; z-index: 10; }
+.table thead th {
+  border-bottom: 2px solid #2a2a2a;
+  color: #ffffff;
+  font-weight: 600;
+  text-transform: uppercase;
+  font-size: 0.75rem;
+  letter-spacing: 0.05em;
+  padding: 1rem 0.75rem;
+  background-color: #000000;
+}
+.table tbody tr { border-bottom: 1px solid #1a1a1a; transition: background 0.2s; }
+.table tbody tr:hover { background: #0f0f0f; }
+.table td { padding: 0.875rem 0.75rem; vertical-align: middle; border-color: #1a1a1a; color: #ffffff;background-color: #000000; }
+.badge-result { padding: 0.375rem 0.75rem; border-radius: 8px; font-weight: 600; font-size: 0.75rem; text-transform: uppercase; letter-spacing: 0.025em; }
+.badge-passed { background: rgba(34, 197, 94, 0.15); color: #4ade80; border: 1px solid rgba(34, 197, 94, 0.25); }
+.badge-promoted { background: rgba(250, 204, 21, 0.15); color: #facc15; border: 1px solid rgba(250, 204, 21, 0.25); }
+.badge-failed { background: rgba(248, 113, 113, 0.15); color: #f87171; border: 1px solid rgba(248, 113, 113, 0.25); }
+.grade-badge { display: inline-block; padding: 0.25rem 0.5rem; border-radius: 6px; font-weight: 600; font-size: 0.7rem; margin: 0.125rem; }
+.grade-s, .grade-o { background: rgba(34, 197, 94, 0.15); color: #4ade80; border: 1px solid rgba(34, 197, 94, 0.2); }
+.grade-a, .grade-a+ { background: rgba(74, 222, 128, 0.15); color: #86efac; border: 1px solid rgba(74, 222, 128, 0.2); }
+.grade-b, .grade-b+ { background: rgba(96, 165, 250, 0.15); color: #60a5fa; border: 1px solid rgba(96, 165, 250, 0.2); }
+.grade-c { background: rgba(168, 85, 247, 0.15); color: #c084fc; border: 1px solid rgba(168, 85, 247, 0.2); }
+.grade-d { background: rgba(250, 204, 21, 0.15); color: #facc15; border: 1px solid rgba(250, 204, 21, 0.2); }
+.grade-e { background: rgba(251, 146, 60, 0.15); color: #fb923c; border: 1px solid rgba(251, 146, 60, 0.2); }
+.grade-fail { background: rgba(248, 113, 113, 0.15); color: #f87171; border: 1px solid rgba(248, 113, 113, 0.2); }
+.subjects-list { max-height: 150px; overflow-y: auto; font-size: 0.875rem; color: #ffffff; }
+.subjects-list::-webkit-scrollbar { width: 6px; }
+.subjects-list::-webkit-scrollbar-track { background: rgba(39, 39, 42, 0.3); border-radius: 3px; }
+.subjects-list::-webkit-scrollbar-thumb { background: #3f3f46; border-radius: 3px; }
+.subjects-list::-webkit-scrollbar-thumb:hover { background: #52525b; }
+        .spinner-border { width: 1.5rem; height: 1.5rem; border-width: 0.2em; }
+        #status { font-size: 0.95rem; color: #94a3b8; }
+        .header-section { display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem; }
+      </style>
+    </head>
+    <body>
+      <div class="page">
+        <nav class="navbar navbar-dark panel-light mb-4 px-3 py-3">
+          <a class="navbar-brand" href="#">
+            <img src="{{ url_for('static', filename='skull.png') }}" onerror="this.onerror=null; this.src='https://cdn-icons-png.flaticon.com/512/12405/12405452.png'" style="height: 64px;" alt="logo" class="logo">
+            <span>OU Results Scraper</span>
+          </a>
+        </nav>
 
-<header class="topbar">
-  <div class="brand">
-    <img src="https://cdn-icons-png.flaticon.com/128/4334/4334124.png">
-    <span>OU Results Scraper</span><i>by charan</i>
-  </div>
-</header>
+        <p class="small-muted mb-4">Enter a results URL and hall-ticket range to fetch and analyze student results. The data will be displayed in an interactive table below.</p>
 
-<div class="app">
+        <form id="scrapeForm" class="row gy-3 g-3 panel mb-4">
+          <div class="col-12">
+            <label for="url" class="form-label">Results LINK change it to yours</label>
+            <input type="url" class="form-control" id="url" name="url" value="{{ default_url }}" placeholder="https://www.osmania.ac.in/res07/20250686.jsp" required>
+          </div>
+          <div class="col-md-4">
+            <label for="start" class="form-label">Start Hall Ticket</label>
+            <input type="number" class="form-control" id="start" name="start" placeholder="110624861001" required>
+          </div>
+          <div class="col-md-4">
+            <label for="end" class="form-label">End Hall Ticket</label>
+            <input type="number" class="form-control" id="end" name="end" placeholder="110624861010" required>
+          </div>
+          <div class="col-md-4">
+            <label for="workers" class="form-label">Max Workers</label>
+            <input type="number" class="form-control" id="workers" name="workers" value="3" min="1" max="20" required>
+          </div>
+          <div class="col-12 d-flex gap-3 align-items-center">
+            <button type="submit" class="btn btn-primary" id="runBtn">
+              <svg width="16" height="16" fill="currentColor" class="me-2" style="display: inline-block; vertical-align: middle;" viewBox="0 0 16 16">
+                <path d="M8 15A7 7 0 1 1 8 1a7 7 0 0 1 0 14zm0 1A8 8 0 1 0 8 0a8 8 0 0 0 0 16z"/>
+                <path d="M6.271 5.055a.5.5 0 0 1 .52.038l3.5 2.5a.5.5 0 0 1 0 .814l-3.5 2.5A.5.5 0 0 1 6 10.5v-5a.5.5 0 0 1 .271-.445z"/>
+              </svg>
+              Run Scraper
+            </button>
+            <div id="loading" class="spinner-border text-primary" role="status" style="display:none;">
+              <span class="visually-hidden">Loading...</span>
+            </div>
+            <div id="status"></div>
+          </div>
+        </form>
 
-  <!-- Controls -->
-  <aside class="sidebar">
-    <h3>Scraper Controls</h3>
+        <div id="output" style="display:none;">
+          <div class="d-flex justify-content-between align-items-center mb-3">
+            <h2 class="h4 mb-0" style="color:#e5e7eb;">Results</h2>
+            <div class="d-flex gap-2">
+              <button id="pdfBtn" class="btn btn-outline-light">Download PDF</button>
+              <button id="exportBtn" class="btn btn-export">Export JSON</button>
+            </div>
+          </div>
 
-    <label>Enter your Results URL</label>
-    <input id="url" value="https://www.osmania.ac.in/res07/20250265.jsp">
-
-    <label>Start Hallticket</label>
-    <input id="start" placeholder="110624861001">
-
-    <label>End Hallticket</label>
-    <input id="end" placeholder="110624861070">
-
-    <label>Workers</label>
-    <input id="workers" value="5">
-
-    <button id="startBtn" onclick="startScrape()">
-      <span id="btnText">Start Scraping</span>
-      <span id="loader" class="loader hidden"></span>
-    </button>
-
-    <!-- Terminal Logs -->
-    <div class="terminal-container">
-      <div class="terminal-header">
-        <span>● Terminal Logs</span>
+          <div class="table-container">
+            <div style="max-height: 600px; overflow-y: auto;">
+              <table class="table table-hover">
+            <thead id="resultsHead"></thead>
+            <tbody id="resultsTable"></tbody>
+              </table>
+            </div>
+          </div>
+        </div>
       </div>
-      <div class="terminal-body" id="terminalLogs">
-        <div class="terminal-line">Ready to scrape...</div>
-      </div>
-    </div>
-  </aside>
 
-  <!-- Results -->
-  <main class="content">
-    <div class="results-header">
-      <h2>Results</h2>
-      <div class="header-controls">
-        <input type="text" id="searchInput" placeholder="🔍 Search table..." class="search-box">
-        <button onclick="downloadPDF()" class="download-btn" title="Download as PDF">
-          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-            <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/>
-            <polyline points="7 10 12 15 17 10"/>
-            <line x1="12" y1="15" x2="12" y2="3"/>
-          </svg>
-          Download PDF
-        </button>
-        <span class="hint">Live update every 1.5s</span>
-      </div>
-    </div>
+      <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+      <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+      <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+      <script>
+        const form = document.getElementById('scrapeForm');
+        const runBtn = document.getElementById('runBtn');
+        const loading = document.getElementById('loading');
+        const statusEl = document.getElementById('status');
+        const output = document.getElementById('output');
+        const resultsTable = document.getElementById('resultsTable');
+        const exportBtn = document.getElementById('exportBtn');
+    
+        let currentData = null;
 
-    <div class="table-wrapper" id="resultsTable">
-      <div class="table-scroll">
-        <table>
-          <thead id="thead"></thead>
-          <tbody id="tbody"></tbody>
-        </table>
-      </div>
-    </div>
-  </main>
+        function setLoading(isLoading, msg = '') {
+          loading.style.display = isLoading ? 'inline-block' : 'none';
+          runBtn.disabled = isLoading;
+          statusEl.textContent = msg;
+        }
 
-</div>
+        function getGradeClass(grade) {
+          const g = String(grade || '').toUpperCase();
+          if (g === 'S' || g === 'O') return 'grade-s';
+          if (g === 'A+' || g === 'A') return 'grade-a';
+          if (g === 'B+' || g === 'B') return 'grade-b';
+          if (g === 'C') return 'grade-c';
+          if (g === 'D') return 'grade-d';
+          if (g === 'E') return 'grade-e';
+          if (g === 'FAIL' || g === 'FAILED') return 'grade-fail';
+          return 'grade-fail';
+        }
 
-<script src="/static/app.js"></script>
-</body>
-</html>
+        function normalizeCode(code) {
+          const map = {
+            'FP&S2': 'FPS',
+            'FP&S': 'FPS',
+            'FPS': 'FPS',
+            'OOP.2': 'OOP',
+            'OOP': 'OOP',
+            'CARC2': 'CARC',
+            'CARC': 'CARC',
+            'DSTR2': 'DSTR',
+            'DSTR': 'DSTR',
+            'ACNS2': 'ACNS',
+            'ACNS': 'ACNS',
+            'IWEB': 'IWEB',
+            'ECOM': 'ECOM',
+            'LAB32': 'L32',
+            'LAB42': 'L42',
+            'LAB52': 'L52',
+            'LAB62': 'L62',
+            'L32': 'L32',
+            'L42': 'L42',
+            'L52': 'L52',
+            'L62': 'L62'
+          };
+          const key = String(code || '').toUpperCase();
+          if (map[key]) return map[key];
+          // fallback: letters/numbers only
+          return key.replace(/[^A-Z0-9]/g, '').slice(0,6) || 'SUBJ';
+        }
+
+        function collectColumns(results) {
+          const found = new Set();
+          for (const r of results) {
+            const subs = r?.subjects || [];
+            for (const s of subs) {
+              found.add(normalizeCode(s.code));
+            }
+          }
+          const preferred = ['FPS','OOP','CARC','DSTR','ACNS','IWEB','ECOM','L32','L42','L52','L62'];
+          const cols = [];
+          for (const c of preferred) {
+            if (found.has(c)) cols.push(c);
+          }
+          // add any extras not in preferred
+          for (const c of Array.from(found).sort()) {
+            if (!cols.includes(c)) cols.push(c);
+          }
+          return cols;
+        }
+
+        function renderResults(payload) {
+          const data = Array.isArray(payload) ? { results: payload } : (payload || {});
+          const results = data.results || [];
+          currentData = results;
+          // Sort by hallticket ascending
+          results.sort((a, b) => {
+            const ah = parseInt(a?.student?.hallticket || '0', 10);
+            const bh = parseInt(b?.student?.hallticket || '0', 10);
+            return ah - bh;
+          });
+      
+          // Show container
+          // Stats overview removed per request
+
+          output.style.display = 'block';
+          // Build dynamic header: HT NO, NAME, RESULT, subject columns
+          const cols = collectColumns(results);
+          const headEl = document.getElementById('resultsHead');
+          headEl.innerHTML = `<tr>
+            <th style="width: 140px;">HT NO</th>
+            <th style="width: 240px;">Name</th>
+            <th style="width: 120px;">Result</th>
+            ${cols.map(c => `<th>${c}</th>`).join('')}
+          </tr>`;
+
+          resultsTable.innerHTML = '';
+
+          for (const r of results) {
+            const tr = document.createElement('tr');
+            const hallticket = r?.student?.hallticket || 'N/A';
+            const name = r?.student?.name || 'N/A';
+            const father = r?.student?.father || 'N/A';
+            const result = String(r?.final_result || 'N/A').toUpperCase();
+            let resultBadgeClass = 'badge-result ';
+            if (result === 'PASSED') resultBadgeClass += 'badge-passed';
+            else if (result === 'PROMOTED') resultBadgeClass += 'badge-promoted';
+            else resultBadgeClass += 'badge-failed';
+
+            // Build grade map by normalized code
+            const gradeByCode = {};
+            if (Array.isArray(r?.subjects)) {
+              r.subjects.forEach(s => {
+                const lab = normalizeCode(s.code);
+                gradeByCode[lab] = s.grade || '-';
+              });
+            }
+
+            const subjectCells = cols.map(c => {
+              const g = gradeByCode[c] || '-';
+              return `<td><span class="grade-badge ${getGradeClass(g)}">${g}</span></td>`;
+            }).join('');
+
+            tr.innerHTML = `
+              <td><strong>${hallticket}</strong></td>
+              <td>${name}<div class="small-muted">${father}</div></td>
+              <td><span class="${resultBadgeClass}">${result}</span></td>
+              ${subjectCells}
+            `;
+            resultsTable.appendChild(tr);
+          }
+        }
+
+        exportBtn.addEventListener('click', () => {
+          if (!currentData) return;
+          const dataStr = JSON.stringify(currentData, null, 2);
+          const blob = new Blob([dataStr], { type: 'application/json' });
+          const url = URL.createObjectURL(blob);
+          const a = document.createElement('a');
+          a.href = url;
+          a.download = `ou_results_${Date.now()}.json`;
+          a.click();
+          URL.revokeObjectURL(url);
+        });
+
+        document.getElementById('pdfBtn').addEventListener('click', async () => {
+          try {
+            setLoading(true, 'Building PDF...');
+            const tableEl = document.querySelector('.table-container table');
+            if (!tableEl) throw new Error('Table not found');
+            const scroller = tableEl.parentElement;
+            const prevMax = scroller.style.maxHeight;
+            const prevOverflow = scroller.style.overflowY;
+            scroller.style.maxHeight = '';
+            scroller.style.overflowY = 'visible';
+
+            const canvas = await html2canvas(tableEl, { scale: 2, backgroundColor: '#000' });
+            scroller.style.maxHeight = prevMax || '600px';
+            scroller.style.overflowY = prevOverflow || 'auto';
+
+            const imgData = canvas.toDataURL('image/png');
+            const { jsPDF } = window.jspdf;
+            const pdf = new jsPDF('p', 'mm', 'a4');
+            const pageWidth = pdf.internal.pageSize.getWidth();
+            const pageHeight = pdf.internal.pageSize.getHeight();
+            const imgWidth = pageWidth;
+            const imgHeight = canvas.height * imgWidth / canvas.width;
+            let heightLeft = imgHeight;
+            let position = 0;
+
+            pdf.addImage(imgData, 'PNG', 0, position, imgWidth, imgHeight);
+            heightLeft -= pageHeight;
+            while (heightLeft > 0) {
+              position = position - pageHeight;
+              pdf.addPage();
+              pdf.addImage(imgData, 'PNG', 0, position, imgWidth, imgHeight);
+              heightLeft -= pageHeight;
+            }
+            pdf.save('ou_results_table.pdf');
+            setLoading(false, 'PDF downloaded');
+          } catch (e) {
+            setLoading(false, 'PDF error: ' + (e.message || e));
+          }
+        });
+
+        form.addEventListener('submit', async (e) => {
+          e.preventDefault();
+          const url = document.getElementById('url').value.trim();
+          const start = parseInt(document.getElementById('start').value, 10);
+          const end = parseInt(document.getElementById('end').value, 10);
+          const workers = parseInt(document.getElementById('workers').value, 10);
+
+          setLoading(true, 'Fetching results...');
+          try {
+            const resp = await fetch('/api/scrape', {
+              method: 'POST',
+              headers: { 'Content-Type': 'application/json' },
+              body: JSON.stringify({ url, start, end, workers })
+            });
+            const data = await resp.json();
+            if (!resp.ok) {
+              throw new Error(data?.error || 'Request failed');
+            }
+            renderResults(data);
+            setLoading(false, 'Complete!');
+          } catch (err) {
+            setLoading(false, 'Error: ' + (err.message || err));
+          }
+        });
+      </script>
+    </body>
+    </html>
