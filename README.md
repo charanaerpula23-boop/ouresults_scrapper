@@ -25,31 +25,34 @@ pip install -r requirements.txt
 
 ## Usage
 
-### Web Application
+### Web Application (Main)
 
-Run the Flask app:
+Run the Flask web app:
 ```bash
 python flaskapp.py
 ```
 
 Then open your browser and navigate to `http://localhost:5000`
 
-### Command Line Tool
+**Note:** `flaskapp.py` is the main application for web-based result scraping.
 
-Run the scraper directly:
+### Command Line Tool (Optional)
+
+For command-line batch processing:
 ```bash
 python app.py
 ```
 
 ## Features Overview
 
-### Web Interface (`flaskapp.py`)
+### Web Interface (`flaskapp.py`) - **Main Application**
 - Enter hall ticket number ranges
 - View results in real-time
 - Export results as JSON
 - See summary statistics
+- No file I/O - results stored in memory
 
-### CLI Tool (`app.py`)
+### CLI Tool (`app.py`) - **Optional**
 - Batch processing with configurable ranges
 - Automatic retry mechanism
 - Progress tracking
