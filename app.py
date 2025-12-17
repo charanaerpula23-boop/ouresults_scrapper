@@ -142,5 +142,10 @@ def get_results():
     return jsonify({"headers": headers, "rows": rows})
 
 
+@app.route("/logs")
+def get_logs():
+    return jsonify({"logs": logs})
+
+
 if __name__ == "__main__":
     app.run(debug=True)

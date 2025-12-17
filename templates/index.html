@@ -40,6 +40,16 @@
       <span id="btnText">Start Scraping</span>
       <span id="loader" class="loader hidden"></span>
     </button>
+
+    <!-- Terminal Logs -->
+    <div class="terminal-container">
+      <div class="terminal-header">
+        <span>● Terminal Logs</span>
+      </div>
+      <div class="terminal-body" id="terminalLogs">
+        <div class="terminal-line">Ready to scrape...</div>
+      </div>
+    </div>
   </aside>
 
   <!-- Results -->
@@ -60,11 +70,13 @@
       </div>
     </div>
 
-    <div class="table-container" id="resultsTable">
-      <table>
-        <thead id="thead"></thead>
-        <tbody id="tbody"></tbody>
-      </table>
+    <div class="table-wrapper" id="resultsTable">
+      <div class="table-scroll">
+        <table>
+          <thead id="thead"></thead>
+          <tbody id="tbody"></tbody>
+        </table>
+      </div>
     </div>
   </main>
 
